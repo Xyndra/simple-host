@@ -1,5 +1,5 @@
-# Multi-stage build compatible with linux/amd64 and linux/arm64 (Raspberry Pi 3/4/5)
-FROM node:20-alpine AS builder
+# Build stage runs on native arch only (fast)
+FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -9,11 +9,12 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
+# Runtime stage uses target arch (amd64 or arm64)
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-COPY --from=builder /app/package.json /app/package-lock.json ./
+COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/build ./build
