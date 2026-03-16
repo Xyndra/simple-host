@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  simple-host:
+    build: .
+    ports:
+      - "5500:5500"
+      - "4050-4170:4050-4170"
+      - "4330-4420:4330-4420"
+      - "4450-4495:4450-4495"
+    volumes:
+      - simple-host-data:/data
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=5500
+      - DATA_DIR=/data/static-sites
+    restart: unless-stopped
+
+volumes:
+  simple-host-data:
