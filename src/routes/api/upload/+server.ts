@@ -5,6 +5,21 @@ import path from 'path';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
 
+function unwrapSingleFolder(dir: string) {
+	const entries = fs.readdirSync(dir, { withFileTypes: true });
+	// Filter out macOS metadata
+	const realEntries = entries.filter(e => !e.name.startsWith('__MACOSX') && !e.name.startsWith('.'));
+
+	if (realEntries.length === 1 && realEntries[0].isDirectory()) {
+		const innerDir = path.join(dir, realEntries[0].name);
+		const innerEntries = fs.readdirSync(innerDir);
+		for (const entry of innerEntries) {
+			fs.renameSync(path.join(innerDir, entry), path.join(dir, entry));
+		}
+		fs.rmdirSync(innerDir);
+	}
+}
+
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const formData = await request.formData();
@@ -30,6 +45,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const zip = new AdmZip(buffer);
 		zip.extractAllTo(siteDir, true);
+
+		// If ZIP contains a single root folder, unwrap it
+		unwrapSingleFolder(siteDir);
 
 		const site = addSite(name, port, siteDir);
 

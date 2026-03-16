@@ -92,7 +92,7 @@ export function startServer(id: string): boolean {
 	if (server.process) return true;
 
 	const serveEntry = path.resolve(process.cwd(), 'node_modules', 'serve', 'build', 'main.js');
-	const childProcess = spawn('node', [serveEntry, '-s', '-l', String(server.port), server.siteDir], {
+	const childProcess = spawn('node', [serveEntry, '--no-clipboard', '-l', String(server.port), server.siteDir], {
 		detached: false,
 		stdio: ['ignore', 'pipe', 'pipe'],
 		env: { ...process.env, PORT: String(server.port) }

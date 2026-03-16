@@ -2,6 +2,9 @@
 	import { onMount } from 'svelte';
 	import { Upload, Globe, Trash2, Play, Square, RefreshCw, FolderOpen, Server, AlertCircle, CheckCircle, Loader2, Info } from 'lucide-svelte';
 
+	let hostname = $state('localhost');
+	onMount(() => { hostname = window.location.hostname; });
+
 	interface Site {
 		id: string;
 		name: string;
@@ -276,7 +279,7 @@
 							<div class="flex items-center gap-2">
 								{#if site.status === 'running'}
 									<a
-										href="http://localhost:{site.port}"
+										href="http://{hostname}:{site.port}"
 										target="_blank"
 										rel="noopener noreferrer"
 										class="btn btn-outline btn-sm"
